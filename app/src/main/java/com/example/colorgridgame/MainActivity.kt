@@ -1,20 +1,57 @@
 package com.example.colorgridgame
 
+import android.graphics.Color
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
+import android.widget.GridLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var grid: GridLayout
+    private val cells = mutableListOf<TextView>()
+
+    private val colors = listOf(
+        Color.RED,
+        Color.YELLOW,
+        Color.GREEN
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+
+        grid = findViewById(R.id.grid)
+
+        createGrid()
+    }
+
+    private fun createGrid() {
+        grid.removeAllViews()
+        cells.clear()
+
+        for (i in 0 until 15) {
+            val cell = TextView(this)
+
+            val params = GridLayout.LayoutParams().apply {
+                width = 0
+                height = 0
+                columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                setMargins(8, 8, 8, 8)
+            }
+
+            cell.layoutParams = params
+
+            cell.setBackgroundColor(randomColor())
+
+            cells.add(cell)
+            grid.addView(cell)
         }
+    }
+
+    private fun randomColor(): Int {
+        return colors[Random.nextInt(colors.size)]
     }
 }
