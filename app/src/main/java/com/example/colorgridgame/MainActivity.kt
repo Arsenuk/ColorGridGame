@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.GridLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlin.random.Random
 
@@ -43,8 +44,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             cell.layoutParams = params
-
             cell.setBackgroundColor(randomColor())
+            cell.tag = cell.currentColorIndex()
+
+            cell.setOnClickListener {
+                changeColor(cell)
+                checkWin()
+            }
 
             cells.add(cell)
             grid.addView(cell)
@@ -53,5 +59,41 @@ class MainActivity : AppCompatActivity() {
 
     private fun randomColor(): Int {
         return colors[Random.nextInt(colors.size)]
+    }
+
+    private fun TextView.currentColorIndex(): Int {
+        return colors.indexOf((this.background as? android.graphics.drawable.ColorDrawable)?.color
+            ?: Color.RED)
+    }
+
+    private fun changeColor(cell: TextView) {
+        val currentColor = (cell.background as android.graphics.drawable.ColorDrawable).color
+        val index = colors.indexOf(currentColor)
+        val nextIndex = (index + 1) % colors.size
+
+        cell.setBackgroundColor(colors[nextIndex])
+    }
+
+    private fun checkWin() {
+        val firstColor = (cells[0].background as android.graphics.drawable.ColorDrawable).color
+
+        val win = cells.all {
+            (it.background as android.graphics.drawable.ColorDrawable).color == firstColor
+        }
+
+        if (win) {
+            showWinDialog()
+        }
+    }
+
+    private fun showWinDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Перемога!")
+            .setMessage("Усі квадрати одного кольору ")
+            .setCancelable(false)
+            .setPositiveButton("Restart") { _, _ ->
+                createGrid()
+            }
+            .show()
     }
 }
