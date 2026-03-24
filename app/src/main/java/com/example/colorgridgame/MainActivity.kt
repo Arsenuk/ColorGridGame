@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
         startLevel1()
     }
-    
+
 
     private fun startLevel1() {
         currentLevel = 1
@@ -41,6 +41,11 @@ class MainActivity : AppCompatActivity() {
         createGrid()
     }
 
+    private fun startLevel3() {
+        currentLevel = 3
+        game.level = Level3()
+        createGrid()
+    }
 
     private fun createGrid() {
         grid.removeAllViews()
@@ -77,7 +82,7 @@ class MainActivity : AppCompatActivity() {
 
         val builder = AlertDialog.Builder(this)
             .setTitle("Перемога!")
-            .setMessage("Рівень $currentLevel пройдено 🎉")
+            .setMessage("Рівень $currentLevel пройдено ")
             .setCancelable(false)
             .setPositiveButton("Restart") { _, _ ->
                 startLevel1()
@@ -89,6 +94,12 @@ class MainActivity : AppCompatActivity() {
         if (currentLevel == 1) {
             builder.setNeutralButton("Next Level") { _, _ ->
                 startLevel2()
+            }
+        }
+
+        if (currentLevel == 2) {
+            builder.setNeutralButton("Next Level") { _, _ ->
+                startLevel3()
             }
         }
 
