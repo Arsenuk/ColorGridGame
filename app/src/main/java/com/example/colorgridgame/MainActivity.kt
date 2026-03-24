@@ -47,6 +47,12 @@ class MainActivity : AppCompatActivity() {
         createGrid()
     }
 
+    private fun startLevel4() {
+        currentLevel = 4
+        game.level = Level4()
+        createGrid()
+    }
+
     private fun createGrid() {
         grid.removeAllViews()
         cells.clear()
@@ -100,6 +106,12 @@ class MainActivity : AppCompatActivity() {
         if (currentLevel == 2) {
             builder.setNeutralButton("Next Level") { _, _ ->
                 startLevel3()
+            }
+        }
+
+        if (currentLevel == 3) {
+            builder.setNeutralButton("Next Level") { _, _ ->
+                startLevel4()
             }
         }
 
