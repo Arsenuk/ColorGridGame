@@ -1,23 +1,19 @@
 package com.example.colorgridgame
 
-import android.graphics.Color
 import android.os.Bundle
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var grid: GridLayout
     private val cells = mutableListOf<TextView>()
 
-    private val colors = listOf(
-        Color.RED,
-        Color.YELLOW,
-        Color.GREEN
-    )
+    private lateinit var game: GameManager
+
+    private var currentLevel = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +21,26 @@ class MainActivity : AppCompatActivity() {
 
         grid = findViewById(R.id.grid)
 
+        game = GameManager {
+            showWinDialog()
+        }
+
+        startLevel1()
+    }
+    
+
+    private fun startLevel1() {
+        currentLevel = 1
+        game.level = Level1()
         createGrid()
     }
+
+    private fun startLevel2() {
+        currentLevel = 2
+        game.level = Level2()
+        createGrid()
+    }
+
 
     private fun createGrid() {
         grid.removeAllViews()
@@ -44,12 +58,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             cell.layoutParams = params
-            cell.setBackgroundColor(randomColor())
-            cell.tag = cell.currentColorIndex()
+            cell.setBackgroundColor(game.randomColor())
 
             cell.setOnClickListener {
-                changeColor(cell)
-                checkWin()
+                val current = (cell.background as android.graphics.drawable.ColorDrawable).color
+                cell.setBackgroundColor(game.nextColor(current))
+
+                game.checkWin(cells)
             }
 
             cells.add(cell)
@@ -57,43 +72,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun randomColor(): Int {
-        return colors[Random.nextInt(colors.size)]
-    }
-
-    private fun TextView.currentColorIndex(): Int {
-        return colors.indexOf((this.background as? android.graphics.drawable.ColorDrawable)?.color
-            ?: Color.RED)
-    }
-
-    private fun changeColor(cell: TextView) {
-        val currentColor = (cell.background as android.graphics.drawable.ColorDrawable).color
-        val index = colors.indexOf(currentColor)
-        val nextIndex = (index + 1) % colors.size
-
-        cell.setBackgroundColor(colors[nextIndex])
-    }
-
-    private fun checkWin() {
-        val firstColor = (cells[0].background as android.graphics.drawable.ColorDrawable).color
-
-        val win = cells.all {
-            (it.background as android.graphics.drawable.ColorDrawable).color == firstColor
-        }
-
-        if (win) {
-            showWinDialog()
-        }
-    }
 
     private fun showWinDialog() {
-        AlertDialog.Builder(this)
+
+        val builder = AlertDialog.Builder(this)
             .setTitle("Перемога!")
-            .setMessage("Усі квадрати одного кольору ")
+            .setMessage("Рівень $currentLevel пройдено 🎉")
             .setCancelable(false)
             .setPositiveButton("Restart") { _, _ ->
-                createGrid()
+                startLevel1()
             }
-            .show()
+            .setNegativeButton("Exit") { _, _ ->
+                finish()
+            }
+
+        if (currentLevel == 1) {
+            builder.setNeutralButton("Next Level") { _, _ ->
+                startLevel2()
+            }
+        }
+
+        builder.show()
     }
 }
